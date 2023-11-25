@@ -4,6 +4,10 @@
 #include <algorithm>
 
 
+bool operator<(const Bus lhs, const Bus rhs) {
+	return lhs.name < rhs.name;
+}
+
 std::ostream& operator<<(std::ostream& output, const Stop& stop) {
 	output << stop.name << ": "
 			<< stop.coordinates.lat << ", "
@@ -18,7 +22,6 @@ std::ostream& operator<<(std::ostream& output, const Bus& bus) {
 	}
 	return output;
 }
-
 
 bool operator==(const Stop& lh, const Stop& rh) {
     return lh.name == rh.name
@@ -38,9 +41,9 @@ void TransportCatalogue::AddStop(Stop new_stop) {
 
 void TransportCatalogue::AddBus(std::pair<std::string, std::vector<std::string>> new_bus) {
 //	std::cout << "void TransportCatalogue::AddBus\n";
-//	TransportCatalogue::Print("stops");
+//	Print("stops");
 //	std::cout << "stopname_to_stop_.size()=" << stopname_to_stop_.size() << std::endl;
-//	TransportCatalogue::Print("buses");
+//	Print("buses");
 //	std::cout << "busname_to_bus_.size()=" << busname_to_bus_.size() << std::endl;
 
 	Bus bus;
@@ -48,7 +51,12 @@ void TransportCatalogue::AddBus(std::pair<std::string, std::vector<std::string>>
 	std::string type_route = new_bus.second.back();
 	new_bus.second.pop_back();
 	for (std::string& stop : new_bus.second) {
-		bus.stops.push_back(stopname_to_stop_.at(std::move(stop)));
+		std::string_view stop_view = stop;
+//		if (!buses_by_stop_.count(stop_view)) {
+//			buses_by_stop_.insert({stopname_to_stop_.at(stop_view)->name, {{}}});
+//		}
+//		Print("buses by stop");
+		bus.stops.push_back(stopname_to_stop_.at(stop_view));
 	}
 	// add circular route
     if (type_route == "-") {
@@ -56,42 +64,45 @@ void TransportCatalogue::AddBus(std::pair<std::string, std::vector<std::string>>
     		bus.stops.push_back(bus.stops[i - 1]);
     	}
     }
-	buses_.push_back(std::move(bus));
+    buses_.push_back(std::move(bus));
     busname_to_bus_.insert({buses_.back().name, &buses_.back()});
+    // Add bus to stops
+	for (std::string& stop : new_bus.second) {
+		std::string_view stop_view = stop;
+		buses_by_stop_[stopname_to_stop_.at(stop_view)->name][buses_.back().name] = &buses_.back();
+	}
+//    Print("buses by stop");
 //    Print("buses");
 }
 
-Stop* TransportCatalogue::GetStop(std::string_view name_stop) const {
-    return stopname_to_stop_.at(name_stop);
-}
-
-const Bus* TransportCatalogue::GetBus(std::string_view name_bus) const {
-    return busname_to_bus_.at(name_bus);
-}
-
-std::vector<Stop*> TransportCatalogue::GetBusInfo(std::string_view name_bus) const {
-    if (busname_to_bus_.count(name_bus)) {
-    	return busname_to_bus_.at(name_bus)->stops;
+Stop* TransportCatalogue::GetStop(std::string_view stop_name) const {
+    if (stopname_to_stop_.count(stop_name)) {
+    	return stopname_to_stop_.at(stop_name);
     }
-    // bus not found
-//    std::vector<Stop*> bus_not_found = {};
+	return nullptr;
+}
+
+const Bus* TransportCatalogue::GetBus(std::string_view bus_name) const {
+	if (busname_to_bus_.count(bus_name)) {
+		return busname_to_bus_.at(bus_name);
+	}
+    return nullptr;
+}
+
+std::vector<Stop*> TransportCatalogue::GetBusInfo(std::string_view bus_name) const {
+    if (busname_to_bus_.count(bus_name)) {
+    	return busname_to_bus_.at(bus_name)->stops;
+    }
 	return {};
 }
 
-/*
-std::pair<std::string_view, std::vector<std::string_view>> TransportCatalogue::GetBusInfo(
-		std::string_view name_bus) const {
-	std::vector<std::string_view> stops;
-	for (const auto& stop : busname_to_bus_.at(name_bus)) {
-		stops.push_back(&stop);
-	}
-	std::cout << "GetBusInfo: \n";
-	for (const auto stop : stops) {
-		std::cout << stop << " ";
-	}
-	return {busname_to_bus_.at(name_bus)->name, stops};
+std::map<std::string_view, Bus*> TransportCatalogue::GetStopInfo(std::string_view stop_name) const {
+    if (buses_by_stop_.count(stop_name)) {
+    	return buses_by_stop_.at(stop_name);
+    }
+	return {};
 }
-*/
+
 void TransportCatalogue::Print(const std::string& name) const {
 	if (name == "stops") {
 		for (const auto& stop : stops_) {
@@ -112,6 +123,16 @@ void TransportCatalogue::Print(const std::string& name) const {
 			std::cout << "[" << item.first << "]=" << item.second << " ";
 		}
 		std::cout << "\n";
+	}
+	else if (name == "buses by stop") {
+		std::cout << "buses_by_stop_: ";
+		for (const auto& [stop, buses] : buses_by_stop_) {
+			std::cout << stop << ":";
+			for (const auto& bus : buses) {
+				std::cout << " " << bus.first;
+			}
+			std::cout << std::endl;
+		}
 	}
 	std::cout << std::endl;
 }

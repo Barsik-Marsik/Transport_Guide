@@ -12,6 +12,7 @@
 
 enum RequestType {
 	Bus_r,      // reading info about the bus from catalog
+	Stop_r,      // reading info about the stop from catalog
 	Bus_w,      // writing info about the bus to catalogue
 	Stop_w,     // writing info about the stop to catalogue
 };

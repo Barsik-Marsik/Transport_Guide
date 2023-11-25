@@ -16,6 +16,22 @@ std::ostream& operator<<(std::ostream& output, const BusInfo& bus) {
     return output;
 }
 
+std::ostream& operator<<(std::ostream& output, const StopInfo& stop) {
+    output << "Stop "
+            << stop.name << ": ";
+    if (!stop.existence) {
+    	return output << "not found";
+    }
+    if (stop.buses.empty()) {
+    	return output << "no buses";
+    }
+    output << "buses";
+    for (const auto& bus : stop.buses) {
+        output << " " << bus.first;
+    }
+    return output;
+}
+
 
 struct HasherStop {
     size_t operator()(const Stop& stop) const {
@@ -49,7 +65,7 @@ BusInfo GetBusInfoToStream(const TransportCatalogue& transport_catalogue, std::s
     BusInfo bus_info;
     // Writing name
     bus_info.name = bus_name;
-    const std::vector<Stop*>& stops_by_bus = transport_catalogue.GetBusInfo(bus_name);
+    const std::vector<Stop*> stops_by_bus = transport_catalogue.GetBusInfo(bus_name);
     if (stops_by_bus.empty()) {
     	return bus_info;
     }
@@ -62,5 +78,19 @@ BusInfo GetBusInfoToStream(const TransportCatalogue& transport_catalogue, std::s
     return bus_info;
 }
 
-//void PrintBusInfo(std::ostream& output, const BusInfo& bus_info) {
-//}
+StopInfo GetStopInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view stop_name) {
+	StopInfo stop_info;
+    // Writing name
+    stop_info.name = stop_name;
+    if (transport_catalogue.GetStop(stop_name) == nullptr) {
+    	return stop_info;
+    }
+    stop_info.existence = true;
+    stop_info.buses = transport_catalogue.GetStopInfo(stop_name);
+    return stop_info;
+}
+
+
+void PrintBusInfo(std::ostream& output, const BusInfo& bus_info) {
+
+}
