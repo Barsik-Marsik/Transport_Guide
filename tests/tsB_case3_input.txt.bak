@@ -1,0 +1,15 @@
+8
+Stop first: 38.45448, 34.822492
+Stop second: 38.525394, 34.98831
+Stop third: 38.708395, 34.867487
+Stop four: 38.535379, 34.672289
+Stop five: 40.515308, 35.637289
+Bus Q: first - second - third - four
+Bus T: first > third > four
+Bus 17gi5Xz6 8GwsxdWXZeTP: third > second > first
+5
+Bus Q
+Bus r
+Stop first
+Stop five
+Stop six

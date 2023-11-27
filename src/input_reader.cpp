@@ -22,8 +22,8 @@ std::string ReadLine(std::istream& input) {
     return s;
 }
 
-RequestQueue::RequestQueue(TransportCatalogue& transport_cataloque)
-    : transport_cataloque_(transport_cataloque)
+RequestQueue::RequestQueue(TransportCatalog& transport_catalog)
+    : transport_catalog_(transport_catalog)
 {
 }
 
@@ -47,13 +47,16 @@ void RequestQueue::AddRequest(std::string raw_request) {
 void RequestQueue::ProcessInputRequests() {
     for (Request& request : input_requests_) {
         if (request.type == RequestType::Stop_w) {
-            transport_cataloque_.AddStop(ParseStopRequest(request));
+            transport_catalog_.AddStop(ParseStopRequest(request));
             // request must be deleted
         }
     }
+    for (auto& [name, raw_distance] : raw_distances_) {
+        transport_catalog_.AddDistances(std::move(name), ParseDistances(raw_distance));
+    }
     for (Request& request : input_requests_) {
         if (request.type == RequestType::Bus_w) {
-            transport_cataloque_.AddBus(ParseBusRequest(request));
+            transport_catalog_.AddBus(ParseBusRequest(request));
             // request must be deleted
         }
     }
@@ -61,11 +64,11 @@ void RequestQueue::ProcessInputRequests() {
 
 void RequestQueue::ProcessOutputRequests(std::ostream& output) {
     for (Request& request : output_requests_) {
-	if (request.type == RequestType::Bus_r) {
-            output << GetBusInfoToStream(transport_cataloque_, ParseOutputRequest(request)) << "\n";
+    if (request.type == RequestType::Bus_r) {
+            output << GetBusInfoToStream(transport_catalog_, ParseOutputRequest(request)) << "\n";
         }
-	if (request.type == RequestType::Stop_r) {
-            output << GetStopInfoToStream(transport_cataloque_, ParseOutputRequest(request)) << "\n";
+    if (request.type == RequestType::Stop_r) {
+            output << GetStopInfoToStream(transport_catalog_, ParseOutputRequest(request)) << "\n";
         }
     }
 }
@@ -90,7 +93,6 @@ void RequestQueue::PrintAllRequests(std::ostream& output) {
         output << "No output requests\n";
     }
 }
-
 
 Request RequestQueue::ParseRawRequest(std::string text) {
 //    std::cout << text << std::endl;
@@ -148,14 +150,31 @@ void RequestQueue::RemoveSpace(std::string& str) {
 Stop RequestQueue::ParseStopRequest(Request& stop_request) {
     Stop stop;
     stop.name = stop_request.name;
-//    std::cout << stop_request.text << std::endl;        // Delete!!!
     std::istringstream input(stop_request.text);
     input >> stop.coordinates.lat;
-//    std::cout << std::setprecision(8) << stop.coordinates.lat << std::endl;        // Delete!!!
     input.ignore(1);        // ignore ','
     input >> stop.coordinates.lng;
-//    std::cout << std::setprecision(8) << stop.coordinates.lng << std::endl;        // Delete!!!
+    input.ignore(1);
+    std::string raw_distance;
+    std::getline(input, raw_distance);
+    if (!raw_distance.empty()) {
+        raw_distances_.push_back({stop.name, std::move(raw_distance)});
+    }
     return stop;
+}
+
+std::vector<std::pair<std::string, int>> RequestQueue::ParseDistances(std::string raw_distance) {
+    std::string text;
+    std::vector<std::pair<std::string, int>> distances;
+    std::istringstream input(raw_distance);
+    while (std::getline(input, text, ',')) {
+        auto m = text.find_first_of('m');
+        int distance = stoi(text.substr(0, m));
+        text = std::move(text.substr(m + 5));
+        RemoveSpace(text);
+        distances.push_back({std::move(text), distance});
+    }
+    return distances;
 }
 
 std::pair<std::string, std::vector<std::string>> RequestQueue::ParseBusRequest(Request& bus_request) {
@@ -183,7 +202,5 @@ std::pair<std::string, std::vector<std::string>> RequestQueue::ParseBusRequest(R
 }
 
 std::string_view RequestQueue::ParseOutputRequest(const Request& output_request) {
-    //std::string_view name = output_request.name;
-    //std::cout << name << std::endl;
     return output_request.name;
 }

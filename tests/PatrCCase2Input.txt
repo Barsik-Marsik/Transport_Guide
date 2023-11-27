@@ -1,0 +1,7 @@
+4
+Stop A: 55.611087, 37.20829
+Stop B: 55.595884, 37.209755, 1000m to A, 1000m to C
+Stop C: 55.632761, 37.333324, 1000m to A
+Bus ABC: A > B > C > A
+1
+Bus ABC

@@ -9,15 +9,15 @@
 
 
 void MainTest() {
-    std::ifstream input("tsB_case1_input.txt");
-    std::ofstream output("tsB_case1_output_result.txt");
+    std::ifstream input("tests/tsC_case1_input.txt");
+    std::ofstream output("tests/tsC_case1_output_result.txt");
 //    std::istream input = std::cin;
 //    std::ostream output = std::cout;
     int N;
     input >> N;
     input.ignore(1);
-    TransportCatalogue transport_catalogue;
-    RequestQueue request_queue(transport_catalogue);
+    TransportCatalog transport_catalog;
+    RequestQueue request_queue(transport_catalog);
     // Writing input requests to the request queue
     request_queue.ReadRawRequests(input, N);
 //    std::cout << "Writing input requests to the request queue is OK" <<std::endl;

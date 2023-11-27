@@ -1,0 +1,5 @@
+Bus Q: 7 stops on route, 4 unique stops, 129975 route length
+Bus r: not found
+Stop first: buses:::: Q T 17gi5Xz6 8GwsxdWXZeTP
+Stop five: no buses
+Stop six: not found

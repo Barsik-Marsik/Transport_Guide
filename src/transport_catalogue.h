@@ -16,12 +16,20 @@
 struct Stop {
     std::string name;
     Coordinates coordinates;
+    std::vector<std::pair<std::string, int>> distances;
 };
 
 // Struct holding information about one Bus
 struct Bus {
     std::string name;
     std::vector<Stop*> stops;
+};
+
+struct HasherStopPtr {
+    size_t operator()(std::pair<Stop*, Stop*> stops) const {
+        return hasher(stops.first->name) + hasher(stops.second->name);
+    }
+    std::hash<std::string> hasher;
 };
 
 bool operator<(const Bus lhs, const Bus rhs);
@@ -32,13 +40,17 @@ std::ostream& operator<<(std::ostream& output, const Bus& bus);
 
 bool operator==(const Stop& lh, const Stop& rh);
 
-class TransportCatalogue {
+class TransportCatalog {
 public:
     void AddStop(Stop new_stop);
+
+    void AddDistances(std::string name, std::vector<std::pair<std::string, int>> distances);
 
     void AddBus(std::pair<std::string, std::vector<std::string>> new_bus);
 
     Stop* GetStop(std::string_view name_stop) const;
+
+    int GetDistance(Stop* stop_A, Stop* stop_B) const;
 
     const Bus* GetBus(std::string_view name_bus) const;
 
@@ -54,4 +66,5 @@ private:
     std::unordered_map<std::string_view, Stop*> stopname_to_stop_;
     std::unordered_map<std::string_view, Bus*> busname_to_bus_;
     std::unordered_map<std::string_view, std::map<std::string_view, Bus*>> buses_by_stop_;
+    std::unordered_map<std::pair<Stop*, Stop*>, int, HasherStopPtr> distances_stops_;
 };

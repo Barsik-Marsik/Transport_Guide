@@ -8,7 +8,7 @@
 
 
 void TestParseRawRequest() {
-    TransportCatalogue tc;
+    TransportCatalog tc;
     RequestQueue rq(tc);
     {
 		std::string text = "Stop Tol okoncevo: 55.673512, 41.021445";
@@ -35,7 +35,7 @@ void TestParseStopRequest() {
 }
 
 void TestParseBusRequest() {
-    TransportCatalogue tc;
+    TransportCatalog tc;
     RequestQueue rq(tc);
     {
 		Request request = {RequestType::Bus_w, "7A", "  Tolo koncevo > LOKO >   Spartak   >  SKA"};

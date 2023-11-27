@@ -8,11 +8,12 @@ std::ostream& operator<<(std::ostream& output, const BusInfo& bus) {
     output << "Bus "
             << bus.name << ": ";
     if (!bus.count_stops) {
-    	return output << "not found";
+        return output << "not found";
     }
     output << bus.count_stops << " stops on route, "
             << bus.unique_stops << " unique stops, "
-            << bus.route_length << " route length";
+            << bus.route_geolength << " route length, "
+            << bus.curvature << " curvature";
     return output;
 }
 
@@ -20,10 +21,10 @@ std::ostream& operator<<(std::ostream& output, const StopInfo& stop) {
     output << "Stop "
             << stop.name << ": ";
     if (!stop.existence) {
-    	return output << "not found";
+        return output << "not found";
     }
     if (stop.buses.empty()) {
-    	return output << "no buses";
+        return output << "no buses";
     }
     output << "buses";
     for (const auto& bus : stop.buses) {
@@ -49,7 +50,7 @@ int CalculateUniqueStops(const std::vector<Stop*>& stops_by_bus) {
     return static_cast<int>(unique_stop.size());
 }
 
-double CalculateRouteLength(const std::vector<Stop*>& stops_by_bus) {
+double CalculateRouteGeoLength(const std::vector<Stop*>& stops_by_bus) {
     std::vector<Coordinates> coordinates(stops_by_bus.size());
     std::transform(std::execution::seq, stops_by_bus.begin(), stops_by_bus.end(),
                             coordinates.begin(), 
@@ -61,36 +62,40 @@ double CalculateRouteLength(const std::vector<Stop*>& stops_by_bus) {
     return distances;
 }
 
-BusInfo GetBusInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view bus_name) {
+double CalculateRouteReallength(const TransportCatalog& transport_catalogue, const std::vector<Stop*>& stops_by_bus) {
+    double reallength = 0.0;
+    for (int i = 0; i < static_cast<int>(stops_by_bus.size()) - 1; ++i) {
+        reallength += transport_catalogue.GetDistance(stops_by_bus[i], stops_by_bus[i + 1]);
+    }
+    return reallength;
+}
+
+BusInfo GetBusInfoToStream(const TransportCatalog& transport_catalogue, std::string_view bus_name) {
     BusInfo bus_info;
     // Writing name
     bus_info.name = bus_name;
     const std::vector<Stop*> stops_by_bus = transport_catalogue.GetBusInfo(bus_name);
     if (stops_by_bus.empty()) {
-    	return bus_info;
+        return bus_info;
     }
     // Writing count_stops
     bus_info.count_stops = stops_by_bus.size();
     // Writing unique stops
     bus_info.unique_stops = CalculateUniqueStops(stops_by_bus);
     // Writing route_length stops
-    bus_info.route_length = CalculateRouteLength(stops_by_bus);
+    bus_info.route_geolength = CalculateRouteReallength(transport_catalogue, stops_by_bus);
+    bus_info.curvature = bus_info.route_geolength / CalculateRouteGeoLength(stops_by_bus);
     return bus_info;
 }
 
-StopInfo GetStopInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view stop_name) {
-	StopInfo stop_info;
+StopInfo GetStopInfoToStream(const TransportCatalog& transport_catalogue, std::string_view stop_name) {
+    StopInfo stop_info;
     // Writing name
     stop_info.name = stop_name;
     if (transport_catalogue.GetStop(stop_name) == nullptr) {
-    	return stop_info;
+        return stop_info;
     }
     stop_info.existence = true;
     stop_info.buses = transport_catalogue.GetStopInfo(stop_name);
     return stop_info;
-}
-
-
-void PrintBusInfo(std::ostream& output, const BusInfo& bus_info) {
-
 }
