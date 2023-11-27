@@ -33,18 +33,18 @@ bool operator==(Stop& lh, Stop& rh) {
         && lh.coordinates == rh.coordinates;
 }
 
-void TransportCatalog::AddStop(Stop new_stop) {
+void TransportCatalogue::AddStop(Stop new_stop) {
     stops_.push_back(std::move(new_stop));
     stopname_to_stop_.insert({stops_.back().name, &stops_.back()});
 }
 
-void TransportCatalog::AddDistances(std::string stop, std::vector<std::pair<std::string, int>> distances) {
+void TransportCatalogue::AddDistances(std::string stop, std::vector<std::pair<std::string, int>> distances) {
     for (auto& [next_stop, distance] : distances) {
         distances_stops_[{stopname_to_stop_.at(stop), stopname_to_stop_.at(next_stop)}] = distance;
     }
 }
 
-void TransportCatalog::AddBus(std::pair<std::string, std::vector<std::string>> new_bus) {
+void TransportCatalogue::AddBus(std::pair<std::string, std::vector<std::string>> new_bus) {
     Bus bus;
     bus.name = std::move(new_bus.first);
     std::string type_route = new_bus.second.back();
@@ -68,14 +68,14 @@ void TransportCatalog::AddBus(std::pair<std::string, std::vector<std::string>> n
     }
 }
 
-Stop* TransportCatalog::GetStop(std::string_view stop_name) const {
+Stop* TransportCatalogue::GetStop(std::string_view stop_name) const {
     if (stopname_to_stop_.count(stop_name)) {
         return stopname_to_stop_.at(stop_name);
     }
     return nullptr;
 }
 
-int TransportCatalog::GetDistance(Stop* stop_A, Stop* stop_B) const {
+int TransportCatalogue::GetDistance(Stop* stop_A, Stop* stop_B) const {
     if (distances_stops_.count({stop_A, stop_B})) {
         return distances_stops_.at({stop_A, stop_B});
     }
@@ -85,28 +85,28 @@ int TransportCatalog::GetDistance(Stop* stop_A, Stop* stop_B) const {
     return 0;
 }
 
-const Bus* TransportCatalog::GetBus(std::string_view bus_name) const {
+const Bus* TransportCatalogue::GetBus(std::string_view bus_name) const {
     if (busname_to_bus_.count(bus_name)) {
         return busname_to_bus_.at(bus_name);
     }
     return nullptr;
 }
 
-std::vector<Stop*> TransportCatalog::GetBusInfo(std::string_view bus_name) const {
+std::vector<Stop*> TransportCatalogue::GetBusInfo(std::string_view bus_name) const {
     if (busname_to_bus_.count(bus_name)) {
         return busname_to_bus_.at(bus_name)->stops;
     }
     return {};
 }
 
-std::map<std::string_view, Bus*> TransportCatalog::GetStopInfo(std::string_view stop_name) const {
+std::map<std::string_view, Bus*> TransportCatalogue::GetStopInfo(std::string_view stop_name) const {
     if (buses_by_stop_.count(stop_name)) {
         return buses_by_stop_.at(stop_name);
     }
     return {};
 }
 
-void TransportCatalog::Print(const std::string& name) const {
+void TransportCatalogue::Print(const std::string& name) const {
     if (name == "stops") {
         for (const auto& stop : stops_) {
             std::cout << stop << " ";

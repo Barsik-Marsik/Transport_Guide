@@ -32,8 +32,8 @@ double CalculateRouteGeoLength(const std::vector<Stop*>& stops_by_bus);
 
 double GetDistanceTwoStops(Stop* stop_A, Stop* stop_B);
 
-double CalculateRouteReallength(const TransportCatalog& transport_catalogue, const std::vector<Stop*>& stops_by_bus);
+double CalculateRouteReallength(const TransportCatalogue& transport_catalogue, const std::vector<Stop*>& stops_by_bus);
 
-BusInfo GetBusInfoToStream(const TransportCatalog& transport_cataloque, std::string_view bus_name);
+BusInfo GetBusInfoToStream(const TransportCatalogue& transport_cataloque, std::string_view bus_name);
 
-StopInfo GetStopInfoToStream(const TransportCatalog& transport_catalogue, std::string_view stop_name);
+StopInfo GetStopInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view stop_name);

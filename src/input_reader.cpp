@@ -22,8 +22,8 @@ std::string ReadLine(std::istream& input) {
     return s;
 }
 
-RequestQueue::RequestQueue(TransportCatalog& transport_catalog)
-    : transport_catalog_(transport_catalog)
+RequestQueue::RequestQueue(TransportCatalogue& transport_catalogue)
+    : transport_catalogue_(transport_catalogue)
 {
 }
 
@@ -47,16 +47,16 @@ void RequestQueue::AddRequest(std::string raw_request) {
 void RequestQueue::ProcessInputRequests() {
     for (Request& request : input_requests_) {
         if (request.type == RequestType::Stop_w) {
-            transport_catalog_.AddStop(ParseStopRequest(request));
+            transport_catalogue_.AddStop(ParseStopRequest(request));
             // request must be deleted
         }
     }
     for (auto& [name, raw_distance] : raw_distances_) {
-        transport_catalog_.AddDistances(std::move(name), ParseDistances(raw_distance));
+        transport_catalogue_.AddDistances(std::move(name), ParseDistances(raw_distance));
     }
     for (Request& request : input_requests_) {
         if (request.type == RequestType::Bus_w) {
-            transport_catalog_.AddBus(ParseBusRequest(request));
+            transport_catalogue_.AddBus(ParseBusRequest(request));
             // request must be deleted
         }
     }
@@ -65,10 +65,10 @@ void RequestQueue::ProcessInputRequests() {
 void RequestQueue::ProcessOutputRequests(std::ostream& output) {
     for (Request& request : output_requests_) {
     if (request.type == RequestType::Bus_r) {
-            output << GetBusInfoToStream(transport_catalog_, ParseOutputRequest(request)) << "\n";
+            output << GetBusInfoToStream(transport_catalogue_, ParseOutputRequest(request)) << "\n";
         }
     if (request.type == RequestType::Stop_r) {
-            output << GetStopInfoToStream(transport_catalog_, ParseOutputRequest(request)) << "\n";
+            output << GetStopInfoToStream(transport_catalogue_, ParseOutputRequest(request)) << "\n";
         }
     }
 }

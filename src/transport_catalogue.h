@@ -40,7 +40,7 @@ std::ostream& operator<<(std::ostream& output, const Bus& bus);
 
 bool operator==(const Stop& lh, const Stop& rh);
 
-class TransportCatalog {
+class TransportCatalogue {
 public:
     void AddStop(Stop new_stop);
 

@@ -62,7 +62,7 @@ double CalculateRouteGeoLength(const std::vector<Stop*>& stops_by_bus) {
     return distances;
 }
 
-double CalculateRouteReallength(const TransportCatalog& transport_catalogue, const std::vector<Stop*>& stops_by_bus) {
+double CalculateRouteReallength(const TransportCatalogue& transport_catalogue, const std::vector<Stop*>& stops_by_bus) {
     double reallength = 0.0;
     for (int i = 0; i < static_cast<int>(stops_by_bus.size()) - 1; ++i) {
         reallength += transport_catalogue.GetDistance(stops_by_bus[i], stops_by_bus[i + 1]);
@@ -70,7 +70,7 @@ double CalculateRouteReallength(const TransportCatalog& transport_catalogue, con
     return reallength;
 }
 
-BusInfo GetBusInfoToStream(const TransportCatalog& transport_catalogue, std::string_view bus_name) {
+BusInfo GetBusInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view bus_name) {
     BusInfo bus_info;
     // Writing name
     bus_info.name = bus_name;
@@ -88,7 +88,7 @@ BusInfo GetBusInfoToStream(const TransportCatalog& transport_catalogue, std::str
     return bus_info;
 }
 
-StopInfo GetStopInfoToStream(const TransportCatalog& transport_catalogue, std::string_view stop_name) {
+StopInfo GetStopInfoToStream(const TransportCatalogue& transport_catalogue, std::string_view stop_name) {
     StopInfo stop_info;
     // Writing name
     stop_info.name = stop_name;

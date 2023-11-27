@@ -31,7 +31,7 @@ std::string ReadLine(std::istream& input);
 
 class RequestQueue {
 public:
-    explicit RequestQueue(TransportCatalog& transport_catalog);
+    explicit RequestQueue(TransportCatalogue& transport_catalogue);
 
     void ReadRawRequests(std::istream& input, int num);
 
@@ -44,7 +44,7 @@ public:
     void PrintAllRequests(std::ostream& output);
 
 private:
-    TransportCatalog& transport_catalog_;
+    TransportCatalogue& transport_catalogue_;
     std::deque<Request> input_requests_;
     std::deque<Request> output_requests_;
     std::deque<std::pair<std::string, std::string>> raw_distances_;

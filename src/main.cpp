@@ -16,8 +16,8 @@ void MainTest() {
     int N;
     input >> N;
     input.ignore(1);
-    TransportCatalog transport_catalog;
-    RequestQueue request_queue(transport_catalog);
+    TransportCatalogue transport_catalogue;
+    RequestQueue request_queue(transport_catalogue);
     // Writing input requests to the request queue
     request_queue.ReadRawRequests(input, N);
 //    std::cout << "Writing input requests to the request queue is OK" <<std::endl;
